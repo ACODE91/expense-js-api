@@ -18,6 +18,7 @@ const passport = require('passport');
 const expressStatusMonitor = require('express-status-monitor');
 const sass = require('node-sass-middleware');
 const multer = require('multer');
+const mySql = require('mysql');
 
 const upload = multer({
   dest: path.join(__dirname, 'uploads')
@@ -30,6 +31,10 @@ dotenv.config({
   path: '.env.example'
 });
 
+dotenv.config({
+  path: '.env.properties'
+});
+
 /**
  * Controllers (route handlers).
  */
@@ -37,6 +42,7 @@ const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 const apiController = require('./controllers/api');
 const contactController = require('./controllers/contact');
+const getRowsController = require('./controllers/getRows.controller');
 
 /**
  * API keys and Passport configuration.
@@ -47,6 +53,23 @@ const passportConfig = require('./config/passport');
  * Create Express server.
  */
 const app = express();
+
+/**
+ * Connect to MySQL
+ */
+
+const mySqlConnection = mySql.createConnection({
+  host: process.env.MYSQL_HOST_URI,
+  user: process.env.MYSQL_LOGIN,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE
+});
+
+mySqlConnection.connect((err) => {
+  if (err) throw err;
+  console.log("Connected!");
+});
+
 
 /**
  * Connect to MongoDB.
@@ -141,6 +164,12 @@ app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/jquery/dist
 app.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), {
   maxAge: 31557600000
 }));
+
+/**
+ * Routes for expensedb
+ */
+
+app.get('/fetchrows', getRowsController.fetchRows);
 
 /**
  * Primary app routes.
