@@ -14,6 +14,7 @@
   "scripts": {
     "postinstall": "npm rebuild node-sass",
     "start": "nodemon app.js",
+    "start-dev": "nodemon ./entry/api-service",
     "test": "nyc mocha --timeout=10000 --exit",
     "lint": "eslint \"**/*.js\""
   },
