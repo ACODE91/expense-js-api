@@ -1,10 +1,12 @@
-const mySqlDatabase = require('../databases/expensedb.js');
+const mySqlDatabase = require("../databases/expensedb.js");
 
-function fetchRows() {
-  // mySqlDatabase.query(`SELECT * FROM expense table`, function(err, result) {
-  //   if (err) throw err;
-  //   return result;
-  // });
+class TableRowsDataService {
+  fetchRows() {
+    mySqlDatabase.query(`SELECT * FROM expensetable;`, function(err, result) {
+      if (err) throw err;
+      return result;
+    });
+  }
 }
 
-module.exports = fetchRows;
+module.exports = new TableRowsDataService();
