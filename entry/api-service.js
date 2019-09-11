@@ -5,9 +5,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const logger = require("morgan");
 const dotenv = require("dotenv");
+const path = require("path");
 const mySqlDatabase = require("../databases/expensedb.js");
 const chalk = require("chalk");
-
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
@@ -19,8 +19,8 @@ dotenv.config({
  * Controllers (route handlers).
  */
 
-const RowsController = require("../controllers/rows.controller");
-
+const ReadRowsController = require("../controllers/rows/read-rows.controller");
+const InsertRowsController = require("../controllers/rows/insert-rows.controller");
 /**
  * Create Express server.
  */
@@ -28,6 +28,8 @@ const app = express();
 
 app.use(logger("dev"));
 app.use(logger("combined"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set("port", process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080);
 
 /**
@@ -35,10 +37,11 @@ app.set("port", process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080);
  */
 mySqlDatabase.connect(err => {
   if (err) throw err;
-  console.log("Connected to mySql");
+  console.log(chalk.green("✓"), "Connected to mySql");
 });
 
-app.get(RowsController.path, RowsController.controller);
+app.get(ReadRowsController.path, ReadRowsController.controller);
+app.post(InsertRowsController.path, bodyParser.json(), InsertRowsController.controller);
 
 /**
  * Start Express server.
