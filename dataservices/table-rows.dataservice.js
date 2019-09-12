@@ -3,21 +3,23 @@ const _ = require("lodash");
 const MandatoryColumns = require("../constants/constants.js");
 
 class TableRowsDataService {
-  async fetchRows() {
-    await mySqlDatabase.query(`SELECT * FROM expensetable;`, function(err, result) {
-      if (err) throw err;
-      return result;
-    });
+  fetchRows({ customerId }) {
+    return new Promise((resolve, reject) => {
+      mySqlDatabase.query(`SELECT *, DATE_FORMAT(date, '%m/%d/%Y') AS date FROM expensetable WHERE customerId=${customerId}`, (err, result) => {
+        if (err) reject(err);
+        resolve(result);
+      });
+    })
   }
 
-  async insertRow({ customerId, expense, payment, description, date }) {
+  insertRow({ customerId, expense, payment, description, date }) {
     const columns = _.values(MandatoryColumns);
     const values = _.values(arguments[0]);
     const formattedColumns = this.formatColumns(columns);
     const formattedValues = this.formatValues(values);
-    await mySqlDatabase.query(
+    mySqlDatabase.query(
       `INSERT INTO expensetable (${formattedColumns}) VALUES(${formattedValues})`,
-      function(err, result) {
+      (err, result) => {
         if (err) throw err;
       }
     );
