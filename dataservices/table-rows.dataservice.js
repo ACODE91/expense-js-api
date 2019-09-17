@@ -1,6 +1,7 @@
 const mySqlDatabase = require("../databases/expensedb.js");
 const _ = require("lodash");
 const MandatoryColumns = require("../constants/constants.js");
+const TotalsColumns = require("../constants/totals-columns.constants.js");
 
 class TableRowsDataService {
   fetchRows({ customerId }) {
@@ -19,6 +20,20 @@ class TableRowsDataService {
     const formattedValues = this.formatValues(values);
     mySqlDatabase.query(
       `INSERT INTO expensetable (${formattedColumns}) VALUES(${formattedValues})`,
+      (err, result) => {
+        if (err) throw err;
+      }
+    );
+  }
+
+  updateTotals({ customerId, expense, payment }) {
+    const columns = _.values(TotalsColumns);
+    const values = _.values(arguments[0]);
+    const formattedColumns = this.formatColumns(columns);
+    const formattedValues = this.formatValues(values);
+
+    mySqlDatabase.query(
+      `INSERT INTO totals (${formattedColumns}) VALUES(${formattedValues})`,
       (err, result) => {
         if (err) throw err;
       }
