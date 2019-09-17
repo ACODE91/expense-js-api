@@ -8,6 +8,9 @@ const dotenv = require("dotenv");
 const path = require("path");
 const mySqlDatabase = require("../databases/expensedb.js");
 const chalk = require("chalk");
+const morgan = require("morgan");
+const cors = require("cors");
+
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
@@ -28,8 +31,16 @@ const app = express();
 
 app.use(logger("dev"));
 app.use(logger("combined"));
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.set("port", process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080);
 
 /**
